@@ -7,5 +7,7 @@ The /grep_features_python contains a Python script which can grep data from diff
 Those generated set can be used to train support vector machine (SVM) models using the MATLAB code in /SVM_MATLAB. In the MATLAB code,  the messages printed on screen and comments can help you. 
 
 Tianshi Wang
+
 University of Delaware
+
 https://tswang.wixsite.com/home
