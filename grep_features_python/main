@@ -1,0 +1,70 @@
+
+import json
+import numpy as np
+import elementTreatment
+import elementFeatures
+import compoundFeature
+
+'''
+The dataset are stored as ./dataSet. For the generation, check divideSet.py.
+Retrieve feature matrix for [m:n] compounds. MaterialsProject Limit is 500/day.
+'''
+with open('./dataSet/trainingSetX.json') as trainingSetX:
+    compoundFomulaList = json.load(trainingSetX)
+with open('./dataSet/crossValidationX.json') as crossValidatoinX:
+    compoundFomulaListCV = json.load(crossValidatoinX)
+with open('./dataSet/testX.json') as testX:
+    compoundFomulaListTest = json.load(testX)
+
+compoundFomulaList = compoundFomulaListTest[:]
+
+'''
+create two lists. 
+list.elementDictList: {'Si':1,'O':2}
+list:sortedElementList:['Fe', 'O']
+'''
+
+list = elementTreatment.ElementDictList(compoundFomulaList)
+list.fomulaToElementDict()
+list.sortElements()
+print('list.compoundFomulaList[1:10]: ',list.compoundFomulaList[1:10])
+print('list.sortedElementList[1:10]: ', list.sortedElementList[1:10])
+print('list.elementDictList[1:10]: ' , list.elementDictList[1:10])
+
+'''
+Add element features such as:
+
+'''
+elementFeatureMatrix = elementFeatures.dataTreatElement(list)  # Send list.sortedElementList and list.elementDictList
+print(elementFeatureMatrix)
+
+
+'''
+Grep data from MaterialsProject. 
+Keys are needed which can be found at https://materialsproject.org/dashboard after you login.
+The limit is 500/day.
+
+'''
+
+materialsprojectKey = "WLSl4VIhdsX0iBOn"
+#grepData.CompoundEntries(list.)
+compoundEntry = compoundFeature.CompoundEntries(materialsprojectKey, list.compoundFomulaList)
+compoundEntry.grepCompoundFeatureMatrix()
+print(compoundEntry.compoundFeatureMatrix)
+
+
+'''
+Combine the elementFeatureMatrix and the compoundFeatureMatrix
+Store the matrix in a json file.
+'''
+
+featureMatrix = np.hstack([elementFeatureMatrix, compoundEntry.compoundFeatureMatrix])
+print(featureMatrix)
+np.savetxt('./output/testFeatureMatrix.dat', featureMatrix, fmt='%10.5f', delimiter=",")
+
+# data = grepData.GrepData(compoundFomulaList[0:10])
+#
+# grepped_entry_list = data.grep_entry_list()
+# entry_list_float = entryToFloat.entryToFloat(grepped_entry_list)
+# element_matrix = dataTreatment.dataTreat(entry_list_float)
+# print(element_matrix)
